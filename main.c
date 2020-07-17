@@ -11,14 +11,15 @@ enum {
 
         WIN_X = 10,
         WIN_Y = 10,
-        WIN_WIDTH = 100,
-        WIN_HEIGHT = 100,
+        WIN_WIDTH = 200,
+        WIN_HEIGHT = 200,
         WIN_BORDER = 1
 };
 
 int main() {
         Display *display;
         Window window;
+        Window window_sub;
         XEvent event;
         int screen;
 
@@ -35,15 +36,29 @@ int main() {
         window = XCreateSimpleWindow(display, RootWindow(display, screen), WIN_X, WIN_Y, WIN_WIDTH, WIN_HEIGHT,
                 WIN_BORDER, BlackPixel(display, screen), WhitePixel(display, screen));
 
+        window_sub = XCreateSimpleWindow(display, RootWindow(display, screen), WIN_X + 10, WIN_Y + 10, WIN_WIDTH + 50, WIN_HEIGHT + 50,
+        WIN_BORDER, BlackPixel(display, screen), WhitePixel(display, screen));
+
+
+
         /* process window close event through event handler so XNextEvent does not fail */
         Atom del_window = XInternAtom(display, "WM_DELETE_WINDOW", 0);
         XSetWMProtocols(display, window, &del_window, 1);
+        XSetWMProtocols(display, window_sub, &del_window, 1);
+
 
         /* select kind of events we are interested in */
         XSelectInput(display, window, ExposureMask | KeyPressMask);
+        XSelectInput(display, window_sub, ExposureMask | KeyPressMask);
+
 
         /* display the window */
+        XMapWindow(display, window_sub);
         XMapWindow(display, window);
+
+        XRaiseWindow(display, window_sub);
+        XLowerWindow(display, window_sub);
+
 
         /* event loop */
         while (1) {
@@ -65,6 +80,8 @@ breakout:
 
         /* destroy window */
         XDestroyWindow(display, window);
+        XDestroyWindow(display, window_sub);
+
 
         /* close connection to server */
         XCloseDisplay(display);
