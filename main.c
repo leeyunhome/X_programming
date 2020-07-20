@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
-
 #include <X11/Xlib.h>
+#include <unistd.h>
 
 enum {
         RECT_X = 20,
@@ -22,6 +22,7 @@ int main() {
         Window window_sub;
         XEvent event;
         int screen;
+        XWindowChanges changes;
 
         /* open connection with the server */
         display = XOpenDisplay(NULL);
@@ -51,14 +52,22 @@ int main() {
         XSelectInput(display, window, ExposureMask | KeyPressMask);
         XSelectInput(display, window_sub, ExposureMask | KeyPressMask);
 
+        // XConfigureWindow(display, window, , &changes);
 
         /* display the window */
-        XMapWindow(display, window_sub);
-        XMapWindow(display, window);
+        // XMapWindow(display, window_sub);
 
-        XRaiseWindow(display, window_sub);
-        XLowerWindow(display, window_sub);
+        // XRaiseWindow(display, window_sub);
+        // XLowerWindow(display, window_sub);
+        for (int i = 0; i < 3; ++i)
+        {
+                XMapWindow(display, window);
 
+                XMoveWindow(display, (int32_t) window, 300 + i, 300 + i);
+                sleep(2);
+                XMapWindow(display, window);
+
+        }
 
         /* event loop */
         while (1) {
